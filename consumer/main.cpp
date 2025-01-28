@@ -20,7 +20,10 @@ int main(int argc, char ** argv )
 
     try 
     {
-        MP3::GetHeading(source_file); 
+        MP3::ID3 id3;
+        id3 = MP3::GetHeading(source_file); 
+        std::cout << "Marker - ID3\n" << "version is - " << id3.version_ << "\n" << "sub version is - " << id3.sub_version_
+        << "\n" << "flag is - " << id3.flag_ << "\n" << "size is - " << id3.size_ << std::endl;
         std::cout << "nice" << std::endl;
     }
     catch( const std::exception& exeption )
