@@ -3,35 +3,26 @@
 #include <string>
 #include <stdexcept>
 #include <cstdint>
-
-
+#include "../libMP3.h"
 
 namespace MP3
 {
-struct ID3
-{
-    std::uint32_t size_ = 0;
-    std::uint8_t version_ = 0;
-    std::uint8_t sub_version_ = 0;
-    std::uint8_t flag_ = 0;
-};
 
 //give to the main.cpp the head of the MP3_file
 ID3 GetHeading( std::ifstream& source_file)
 {  
-    // amount of bayts in head of MP3_file
-    static constexpr const int sizeID3 = 3;
-    static const std::string ID3_head = "ID3";
-    // array-buffer for the result Class of this func (C-style) 
-    //+2 mean 1 is '\0' and another 1 for full size of ID3
-    char signature[sizeID3+2] = {'\0'};
 
+    static const std::string ID3_head = "ID3";
+    // array-buffer for the result Class (besides size_) of this func (C-style) 
     //verification if file can be opened  
     if (!source_file.is_open())
     {
     throw std::invalid_argument("Incorrect source file name!"); 
     }
-
+    // amount of bayts in head of MP3_file
+    static constexpr const int sizeID3 = 3;
+    // array-buffer for the result Class (besides size_) (C-style) 
+    char signature[sizeID3+1] = {'\0'};
     source_file.read(signature, sizeID3);
     if (ID3_head != signature)
     {
@@ -46,33 +37,50 @@ ID3 GetHeading( std::ifstream& source_file)
         {
             if( i == 0 ) 
             {
-                source_file.read(signature, sizeof(std::uint8_t));
-                id3.version_ = std::stoi(signature);
+                id3.version_ = std::stoi(make_buffer_array(i, source_file));
                 break;
             }
             else if( i == 1 ) 
             {
-                source_file.read(signature, sizeof(std::uint8_t));
-                id3.sub_version_ = std::stoi(signature);
+                id3.sub_version_ = std::stoi(make_buffer_array(i, source_file));
                 break;
             }
             else if( i == 2 ) 
             {
-                source_file.read(signature, sizeof(std::uint8_t));
-                id3.flag_ = std::stoi(signature);
+                id3.flag_ = std::stoi(make_buffer_array(i, source_file));
                 break;
             }
             break;
         }
         else
         {
-            source_file.read(signature, sizeof(std::uint32_t));
-            id3.size_ = std::stoi(signature);
+            id3.size_ = std::stoi(make_buffer_array(i, source_file));
             break;
         }
         break;
     }
     return id3;
 
+}
+
+// make universial array for data from header of MP3
+char* make_buffer_array(int index, std::ifstream& source_file)
+{
+    int size_index = 3;
+    
+    if (index != size_index)
+    {
+        // array-buffer for the result Class (besides size_) (C-style) 
+        char signature[sizeof(std::uint8_t)+1] = {'\0'};
+        source_file.read(signature, sizeof(std::uint8_t));
+        return signature;
+    }
+    else
+    {
+        // array-buffer for the size_ of result Class (C-style) 
+        char signature[sizeof(std::uint32_t)+1] = {'\0'};
+        source_file.read(signature, sizeof(std::uint32_t));
+        return signature;
+    }
 }
 }// namespace MP3

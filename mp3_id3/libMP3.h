@@ -5,6 +5,9 @@
 
 namespace MP3
 {
+
+char* make_buffer_array(int index, std::ifstream& source_file);
+
 struct ID3
 {
     std::uint32_t size_ = 0;
