@@ -16,14 +16,14 @@ int main(int argc, char ** argv )
     // MP3_file for the result after using MP3::GetHeading
     std::ofstream Head_file("Head_file.txt", std::ios_base::app);
     // source MP3_file for the MP3::GetHeading
-    std::ifstream source_file(argv[2], std::ios::binary);
+    std::ifstream source_file(argv[1], std::ios::binary);
 
     try 
     {
         MP3::ID3 id3;
         id3 = MP3::GetHeading(source_file); 
-        std::cout << "Marker - ID3\n" << "version is - " << id3.version_ << "\n" << "sub version is - " << id3.sub_version_
-        << "\n" << "flag is - " << id3.flag_ << "\n" << "size is - " << id3.size_ << std::endl;
+        std::cout << "Marker - ID3\n" << "version is - " << int(id3.version_) << "\n" << "sub version is - " << int(id3.sub_version_)
+        << "\n" << "flag is - " << int(id3.flag_) << "\n" << "size is - " << std::hex << id3.size_ << std::endl;
         std::cout << "nice" << std::endl;
     }
     catch( const std::exception& exeption )

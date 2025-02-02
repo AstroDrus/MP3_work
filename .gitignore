@@ -1,0 +1,8 @@
+CMakeCache.txt
+*.cmake
+CMakeFiles*/
+Makefile
+build*/
+.vscode
+*.mp3
+*.txt

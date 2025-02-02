@@ -3,6 +3,9 @@
 #include <string>
 #include <stdexcept>
 #include <cstdint>
+
+#include <arpa/inet.h>
+
 #include "../libMP3.h"
 
 namespace MP3
@@ -28,59 +31,25 @@ ID3 GetHeading( std::ifstream& source_file)
     {
         throw std::invalid_argument("source file is not an MP3 file with IDv3 tag");
     }
-    ID3 id3{};
-    source_file.read(signature, sizeof(std::uint8_t));
-
-    for (int i = 0; i <= sizeID3; ++i) 
-    {
-        if (i < 3)
-        {
-            if( i == 0 ) 
-            {
-                id3.version_ = std::stoi(make_buffer_array(i, source_file));
-                break;
-            }
-            else if( i == 1 ) 
-            {
-                id3.sub_version_ = std::stoi(make_buffer_array(i, source_file));
-                break;
-            }
-            else if( i == 2 ) 
-            {
-                id3.flag_ = std::stoi(make_buffer_array(i, source_file));
-                break;
-            }
-            break;
-        }
-        else
-        {
-            id3.size_ = std::stoi(make_buffer_array(i, source_file));
-            break;
-        }
-        break;
-    }
-    return id3;
-
-}
-
-// make universial array for data from header of MP3
-char* make_buffer_array(int index, std::ifstream& source_file)
-{
-    int size_index = 3;
+     ID3 id3{};
     
-    if (index != size_index)
+    // besides size_
+    constexpr int size_of_elements = 3;  
+    std::uint8_t* array[size_of_elements] = 
+    { 
+          &id3.version_
+        , &id3.sub_version_
+        , &id3.flag_
+    };
+    
+    for (int i = 0; i < size_of_elements; ++i) 
     {
-        // array-buffer for the result Class (besides size_) (C-style) 
-        char signature[sizeof(std::uint8_t)+1] = {'\0'};
-        source_file.read(signature, sizeof(std::uint8_t));
-        return signature;
+        source_file.read( reinterpret_cast< char* >( array[ i ] ), sizeof( *( array[ i ] ) ) );
     }
-    else
-    {
-        // array-buffer for the size_ of result Class (C-style) 
-        char signature[sizeof(std::uint32_t)+1] = {'\0'};
-        source_file.read(signature, sizeof(std::uint32_t));
-        return signature;
-    }
+    source_file.read( reinterpret_cast< char* >( &id3.size_ ), sizeof( id3.size_ ) );
+
+    id3.size_ = ntohl(id3.size_);
+     
+    return id3;
 }
-}// namespace MP3
+} //namespace MP3
