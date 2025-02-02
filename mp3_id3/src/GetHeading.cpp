@@ -3,6 +3,8 @@
 #include <string>
 #include <stdexcept>
 #include <cstdint>
+#include <vector>
+#include <algorithm>
 
 #include <arpa/inet.h>
 
@@ -34,22 +36,74 @@ ID3 GetHeading( std::ifstream& source_file)
      ID3 id3{};
     
     // besides size_
-    constexpr int size_of_elements = 3;  
+    constexpr int size_of_elements = 3;
     std::uint8_t* array[size_of_elements] = 
     { 
-          &id3.version_
-        , &id3.sub_version_
-        , &id3.flag_
+          id3.get_adr_version_()
+        , id3.get_adr_sub_version_()
+        , id3.get_adr_flag_()
     };
     
     for (int i = 0; i < size_of_elements; ++i) 
     {
         source_file.read( reinterpret_cast< char* >( array[ i ] ), sizeof( *( array[ i ] ) ) );
     }
-    source_file.read( reinterpret_cast< char* >( &id3.size_ ), sizeof( id3.size_ ) );
 
-    id3.size_ = ntohl(id3.size_);
-     
-    return id3;
+    source_file.read( reinterpret_cast< char* >( id3.get_adr_size_() ), sizeof( *id3.get_adr_size_() ) );
+
+    //id3.set_size_(ntohl(*id3.get_adr_size_()));
+    id3.set_size_(id3.make_right_sizeadr(*id3.get_adr_size_()));
+
+return id3;
+
 }
+
+std::uint32_t ID3::make_right_sizeadr(uint32_t size)
+{
+    size = ntohl(size); 
+    return size;
+}
+
+//getters
+std::uint8_t* ID3::get_adr_version_()
+{
+    return &version_;
+} 
+
+std::uint8_t* ID3::get_adr_sub_version_()
+{
+    return &sub_version_;
+} 
+
+std::uint8_t* ID3::get_adr_flag_()
+{
+    return &flag_;
+} 
+
+std::uint32_t* ID3::get_adr_size_()
+{
+    return &size_;
+} 
+
+//setters
+void ID3::set_version_(const std::uint8_t val)
+{
+    version_ = val;
+}
+
+void ID3::set_sub_version_(const std::uint8_t val)
+{
+    sub_version_ = val;
+}
+
+void ID3::set_flag_(const std::uint8_t val)
+{
+   flag_ = val;
+}
+
+void ID3::set_size_(const std::uint32_t val)
+{
+   size_ = val;
+}
+
 } //namespace MP3

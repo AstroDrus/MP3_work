@@ -3,6 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <string>
+
 #include "libMP3.h"
 
 
@@ -22,9 +23,8 @@ int main(int argc, char ** argv )
     {
         MP3::ID3 id3;
         id3 = MP3::GetHeading(source_file); 
-        std::cout << "Marker - ID3\n" << "version is - " << int(id3.version_) << "\n" << "sub version is - " << int(id3.sub_version_)
-        << "\n" << "flag is - " << int(id3.flag_) << "\n" << "size is - " << std::hex << id3.size_ << std::endl;
-        std::cout << "nice" << std::endl;
+        std::cout << "Marker - ID3\n" << "version is - " << int(*id3.get_adr_version_()) << "\n" << "sub version is - " << int(*id3.get_adr_sub_version_())
+        << "\n" << "flag is - " << int(*id3.get_adr_flag_()) << "\n" << "size is - " << std::hex << *id3.get_adr_size_() << std::endl;
     }
     catch( const std::exception& exeption )
     {
