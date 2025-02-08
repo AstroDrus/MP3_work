@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <vector>
 #include <algorithm>
+#include <bitset>
+#include <climits>
 
 #include <arpa/inet.h>
 
@@ -60,7 +62,10 @@ return id3;
 
 std::uint32_t ID3::make_right_sizeadr(uint32_t size)
 {
-    size = ntohl(size); 
+    size = ntohl(size);
+    std::cout << std::bitset<sizeof(size) * CHAR_BIT>(size) << std::endl;
+
+
     return size;
 }
 
