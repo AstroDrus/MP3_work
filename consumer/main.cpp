@@ -26,6 +26,7 @@ int main(int argc, char ** argv )
         
         std::cout << "marker - ID3\n" << "version is - " << int(id3.get_version_()) << "\n" << "sub version is - " << int(id3.get_sub_version_())
         << "\n" << "flag is - " << int(id3.get_flag_()) << "\n" << "size is - " << std::hex << id3.get_size_() << std::endl;
+
     }
     catch( const std::exception& exeption )
     {

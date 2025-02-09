@@ -22,7 +22,9 @@ ID3 GetHeading( std::ifstream& source_file)
     //verification if file can be opened  
     if (!source_file.is_open())
     {
+
         throw std::invalid_argument("Incorrect source file name!"); 
+
     }
     // amount of bayts in head of MP3_file
     static constexpr const int sizeID3 = 3;
@@ -33,7 +35,7 @@ ID3 GetHeading( std::ifstream& source_file)
     {
         throw std::invalid_argument("source file is not an MP3 file with IDv3 tag");
     }
-        
+       
     // besides size_
     constexpr int size_of_elements = 3;
 
@@ -98,6 +100,7 @@ std::uint8_t ID3::get_flag_()
 std::uint32_t ID3::get_size_()
 {
 		return size_;
+
 } 
 
 //setters
@@ -118,7 +121,7 @@ void ID3::set_flag_(const std::uint8_t val)
 
 void ID3::set_size_(const std::uint32_t val)
 {
-	 size_ = val;
+   size_ = val;
 }
 
 } //namespace MP3
