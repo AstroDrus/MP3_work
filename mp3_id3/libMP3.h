@@ -12,10 +12,10 @@ class ID3
 {
 public:
 
-std::uint8_t* get_adr_version_();
-std::uint8_t* get_adr_sub_version_();
-std::uint8_t* get_adr_flag_();
-std::uint32_t* get_adr_size_();
+std::uint8_t get_version_();
+std::uint8_t get_sub_version_();
+std::uint8_t get_flag_();
+std::uint32_t get_size_();
 
 void set_version_(const std::uint8_t val);
 void set_sub_version_(const std::uint8_t val);
