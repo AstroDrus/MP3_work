@@ -7,6 +7,7 @@
 #include "libMP3.h"
 
 
+
 int main(int argc, char ** argv )
 {
     if (argc != 2)
@@ -21,11 +22,9 @@ int main(int argc, char ** argv )
 
     try 
     {
-        MP3::ID3 id3;
-        id3 = MP3::GetHeading(source_file); 
-        
-        std::cout << "marker - ID3\n" << "version is - " << int(id3.get_version_()) << "\n" << "sub version is - " << int(id3.get_sub_version_())
-        << "\n" << "flag is - " << int(id3.get_flag_()) << "\n" << "size is - " << std::hex << id3.get_size_() << std::endl;
+        MP3::Mp3Worker worker {source_file};
+        std::cout << worker << std::endl;
+
     }
     catch( const std::exception& exeption )
     {
