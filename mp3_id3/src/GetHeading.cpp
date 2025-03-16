@@ -22,7 +22,9 @@ ID3v2Header ParseId3V2Header()
     //verification if file can be opened  
     if (!source_file_.is_open())
     {
+
         throw std::invalid_argument("Incorrect source file name!"); 
+
     }
     // amount of bayts in head of MP3_file
     static constexpr const int sizeID3 = 3;
@@ -33,7 +35,7 @@ ID3v2Header ParseId3V2Header()
     {
         throw std::invalid_argument("source file is not an MP3 file with IDv3 tag");
     }
-        
+       
     // besides size_
     constexpr int size_of_elements = 3;
 
@@ -158,6 +160,7 @@ EnCoding ID3v2Frame::get_encoding_()
 
 std::string ID3v2Frame::get_Information_()
 {
+
      return data_.Information;
 }
 
@@ -190,7 +193,6 @@ void ID3v2Frame::set_Information_(const std::string val)
 
 std::ostream& operator<<( std::ostream& stream, const Mp3Worker& mp3Worker )
 {
-
         std::cout << "marker - ID3" 
         << "\n" << "version is - " << int(headofMP3.get_version_()) 
         << "\n" << "sub version is - " << int(headofMP3.get_sub_version_())

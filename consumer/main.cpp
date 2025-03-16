@@ -24,7 +24,6 @@ int main(int argc, char ** argv )
     {
         MP3::Mp3Worker worker {source_file};
         std::cout << worker << std::endl;
-
     }
     catch( const std::exception& exeption )
     {
