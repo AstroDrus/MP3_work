@@ -22,7 +22,7 @@ int main(int argc, char ** argv )
 
     try 
     {
-        MP3::Mp3Worker worker {source_file};
+        MP3::Mp3Worker worker {std::move(source_file)};
         std::cout << worker << std::endl;
     }
     catch( const std::exception& exeption )

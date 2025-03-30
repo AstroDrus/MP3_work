@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include <algorithm>
+#include <cstdint>
 
 namespace MP3
 {
@@ -23,6 +24,7 @@ enum EnCoding : std::uint8_t
 {
       Iso8859 = 0x00
     , Unicode = 0x01
+    , None
 };
  
 struct Data
@@ -34,8 +36,16 @@ struct Data
 class ID3v2Frame
 {
 public:
-    ID3v2Frame( ID3v2FrameHeader header, Data data ) 
-    : header_(header), data_(data){}
+    ID3v2Frame( ID3v2FrameHeader&& header, Data&& data ) 
+    : header_(std::move(header)), data_(std::move(data)){}
+    ID3v2Frame(): header_(), data_()
+    {
+        data_.encoding = None;
+        data_.Information = nullptr;
+        header_.Frame_ID[ frameIdSize_ ] = {'0'};
+        header_.Size = 0;
+        header_.Flags = 0;
+    };
 
 public:
 std::string get_Frame_ID_();
@@ -50,19 +60,27 @@ void set_flags_(const std::uint16_t val);
 void set_encoding_(const EnCoding val);
 void set_Information_(const std::string val);
 
+  ID3v2Frame operator= (const ID3v2Frame& other ) const
+    {
+        return other;
+    }
 
 private:
     ID3v2FrameHeader header_;
     Data data_;
 };
 
-struct MP3_header
+std::ostream& operator<<( std::ostream& stream, 
+ID3v2Frame& out_frame )
 {
-    std::uint32_t size_ = 0;
-    std::uint8_t version_ = 0;
-    std::uint8_t sub_version_ = 0;
-    std::uint8_t flag_ = 0;
-};
+    return stream << out_frame.get_Frame_ID_() << "\n"
+        << std::hex << out_frame.get_size_() << "\n"
+        << int(out_frame.get_flags_()) << "\n"
+        << int(out_frame.get_encoding_()) << "\n"
+        << out_frame.get_Information_() 
+        << std::endl;
+}
+
 
 class ID3v2Header
 {
@@ -81,23 +99,35 @@ void set_size_(const std::uint32_t val);
 std::uint32_t make_right_sizeadr(uint32_t size);
 
 private:
-MP3_header mp3_header_;
-
+    std::uint32_t size_ = 0;
+    std::uint8_t version_ = 0;
+    std::uint8_t sub_version_ = 0;
+    std::uint8_t flag_ = 0;
 };
+
+std::ostream& operator<<( std::ostream& stream, ID3v2Header& out_head )
+{
+    return stream << int(out_head.get_version_()) << "\n"
+    << int(out_head.get_sub_version_()) << "\n"
+    << int(out_head.get_flag_()) << "\n"
+    << std::hex << out_head.get_size_() << "\n"
+    << std::endl;
+
+}
 
 
 class Mp3Worker
 {
-friend std::ostream& operator<<( std::ostream& stream, const Mp3Worker& mp3Worker );
+friend std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker );
 
 public:
-    Mp3Worker( std::ifstream path2file ) 
-    : source_file_(path2file)
+    Mp3Worker(std::ifstream&& path2file ) 
+    : source_file_(std::move(path2file))
     {
         ParseId3V2Header();
         ReadFrame();
     }
- 
+
 private:
     void ParseId3V2Header();
     void ReadFrame();
@@ -110,7 +140,7 @@ private:
 }; // class Mp3Worker
  
  
-std::ostream& operator<<( std::ostream& stream, const Mp3Worker& mp3Worker );
+std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker );
 
 } // namespace MP3
 

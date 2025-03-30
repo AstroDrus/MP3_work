@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <vector>
 #include <algorithm>
+#include <cstring>
 
 #include <arpa/inet.h>
 
@@ -14,7 +15,7 @@ namespace MP3
 {
 
 //give to the main.cpp the head of the MP3_file
-ID3v2Header ParseId3V2Header()
+void Mp3Worker :: ParseId3V2Header()
 {  
 
     static const std::string ID3_head = "ID3";
@@ -69,7 +70,15 @@ void Mp3Worker::ReadFrame()
     data.Information.resize( dataSize );
  
     source_file_.read( reinterpret_cast< char* >( data.Information.data() ), sizeof( dataSize ) );
-    ID3v2Frame frame{ header, data };
+    
+    ID3v2Frame frame{std::move(header), std::move(data)};
+
+    frame_ = frame;
+
+
+
+    //frame_.header_= header;
+    //frame_.data_ = data;
 }
 
 
@@ -98,43 +107,43 @@ return size;
 //getters for main header (id3v2Header_)
 std::uint8_t ID3v2Header::get_version_()
 {
-	return mp3_header_.version_;
+	return version_;
 } 
 
 std::uint8_t ID3v2Header::get_sub_version_()
 {
-	return mp3_header_.sub_version_;
+	return sub_version_;
 } 
 
 std::uint8_t ID3v2Header::get_flag_()
 {
-	return mp3_header_.flag_;
+	return flag_;
 } 
 
 std::uint32_t ID3v2Header::get_size_()
 {
-	return mp3_header_.size_;
+	return size_;
 } 
 
 //setters for main header (id3v2Header_)
 void ID3v2Header::set_version_(const std::uint8_t val)
 {
-	mp3_header_.version_ = val;
+	version_ = val;
 }
 
 void ID3v2Header::set_sub_version_(const std::uint8_t val)
 {
-	mp3_header_.sub_version_ = val;
+	sub_version_ = val;
 }
 
 void ID3v2Header::set_flag_(const std::uint8_t val)
 {
-	mp3_header_.flag_ = val;
+	flag_ = val;
 }
 
 void ID3v2Header::set_size_(const std::uint32_t val)
 {
-	mp3_header_.size_ = val;
+	size_ = val;
 }
 
 //setters for frame header (frame_)
@@ -168,7 +177,7 @@ std::string ID3v2Frame::get_Information_()
 //setters for frame header (frame_)
 void ID3v2Frame::set_Frame_ID_(const char val[frameIdSize_])
 {
-    header_.Frame_ID = val;
+    strcpy(header_.Frame_ID, val);
 }
 
 void ID3v2Frame::set_size_(const std::uint32_t val)
@@ -191,19 +200,12 @@ void ID3v2Frame::set_Information_(const std::string val)
     data_.Information = val;
 }
 
-std::ostream& operator<<( std::ostream& stream, const Mp3Worker& mp3Worker )
+std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker )
 {
-        std::cout << "marker - ID3" 
-        << "\n" << "version is - " << int(headofMP3.get_version_()) 
-        << "\n" << "sub version is - " << int(headofMP3.get_sub_version_())
-        << "\n" << "flag is - " << int(headofMP3.get_flag_()) 
-        << "\n" << "size is - " << std::hex << headofMP3.get_size_() 
-        << "\n" << "frame ID - " << //... 
-        << "\n" << "frame size is - " << //...
-        << "\n" << "frame flag is - " << //...
-        << "\n" << "frame encoding is - " << //...
-        << "\n" << "frame Information is - " << //...
-        << std::endl;
+        
+    return stream << "marker - ID3" << "\n" << mp3Worker.id3v2Header_ << "\n"
+    << mp3Worker.frame_<< std::endl;
+        
 }
 
 } //namespace MP3
