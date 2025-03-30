@@ -41,7 +41,7 @@ public:
     ID3v2Frame(): header_(), data_()
     {
         data_.encoding = None;
-        data_.Information = nullptr;
+        data_.Information;
         header_.Frame_ID[ frameIdSize_ ] = {'0'};
         header_.Size = 0;
         header_.Flags = 0;
@@ -60,26 +60,22 @@ void set_flags_(const std::uint16_t val);
 void set_encoding_(const EnCoding val);
 void set_Information_(const std::string val);
 
-  ID3v2Frame operator= (const ID3v2Frame& other ) const
+ID3v2Frame operator= (const ID3v2Frame& other )
+{
+    if (this != &other)
     {
-        return other;
+        header_ = other.header_;
+        data_ = other.data_;
     }
+    return *this;
+}
 
 private:
     ID3v2FrameHeader header_;
     Data data_;
 };
 
-std::ostream& operator<<( std::ostream& stream, 
-ID3v2Frame& out_frame )
-{
-    return stream << out_frame.get_Frame_ID_() << "\n"
-        << std::hex << out_frame.get_size_() << "\n"
-        << int(out_frame.get_flags_()) << "\n"
-        << int(out_frame.get_encoding_()) << "\n"
-        << out_frame.get_Information_() 
-        << std::endl;
-}
+std::ostream& operator<<( std::ostream& stream, ID3v2Frame& out_frame );
 
 
 class ID3v2Header
@@ -105,15 +101,7 @@ private:
     std::uint8_t flag_ = 0;
 };
 
-std::ostream& operator<<( std::ostream& stream, ID3v2Header& out_head )
-{
-    return stream << int(out_head.get_version_()) << "\n"
-    << int(out_head.get_sub_version_()) << "\n"
-    << int(out_head.get_flag_()) << "\n"
-    << std::hex << out_head.get_size_() << "\n"
-    << std::endl;
-
-}
+std::ostream& operator<<( std::ostream& stream, ID3v2Header& out_head );
 
 
 class Mp3Worker

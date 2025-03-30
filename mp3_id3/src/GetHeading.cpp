@@ -75,10 +75,6 @@ void Mp3Worker::ReadFrame()
 
     frame_ = frame;
 
-
-
-    //frame_.header_= header;
-    //frame_.data_ = data;
 }
 
 
@@ -102,6 +98,27 @@ std::uint32_t ID3v2Header::make_right_sizeadr( std::uint32_t size )
 		}
 
 return size;
+}
+
+// frame outstream
+std::ostream& operator<<( std::ostream& stream, ID3v2Frame& out_frame )
+{
+    return stream << std::hex << out_frame.get_Frame_ID_() << "\n"
+        << std::hex << out_frame.get_size_() << "\n"
+        << std::hex << /*int*/out_frame.get_flags_() << "\n"
+        << std::hex << /*int*/out_frame.get_encoding_() << "\n"
+        << std::hex << out_frame.get_Information_() 
+        << std::endl;
+}
+
+// header outstream
+std::ostream& operator<<( std::ostream& stream, ID3v2Header& out_head )
+{
+    return stream << int(out_head.get_version_()) << "\n"
+    << int(out_head.get_sub_version_()) << "\n"
+    << int(out_head.get_flag_()) << "\n"
+    << std::hex << out_head.get_size_();
+
 }
 
 //getters for main header (id3v2Header_)
@@ -203,7 +220,7 @@ void ID3v2Frame::set_Information_(const std::string val)
 std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker )
 {
         
-    return stream << "marker - ID3" << "\n" << mp3Worker.id3v2Header_ << "\n"
+    return stream << "Header information:\nmarker - ID3" << "\n" << mp3Worker.id3v2Header_ << "\nFrame information: "
     << mp3Worker.frame_<< std::endl;
         
 }
