@@ -58,23 +58,47 @@ void Mp3Worker :: ParseId3V2Header()
 }
 
 void Mp3Worker::ReadFrame()
-{
+{   
     ID3v2FrameHeader header;
-    source_file_.read( reinterpret_cast< char* >( &header ), sizeof( header) );
- 
-    Data data;
-    source_file_.read( reinterpret_cast< char* >( &( data.encoding ) ), sizeof( EnCoding ) );
-    // minus encoding
-    const std::uint32_t dataSize{ header.Size - 1 };
- 
-    data.Information.resize( dataSize );
- 
-    source_file_.read( reinterpret_cast< char* >( data.Information.data() ), sizeof( dataSize ) );
+    source_file_.read( reinterpret_cast< char* >( &header.Frame_ID ), frameIdSize_ );
     
-    ID3v2Frame frame{std::move(header), std::move(data)};
+    if (header.Frame_ID[0] != 'T')
+    {
+        source_file_.read( reinterpret_cast< char* >( &header.Size ), sizeof( header.Size ) );
+        header.Size = ntohl(header.Size);
+        
+        source_file_.read( reinterpret_cast< char* >( &header.Flags ), sizeof( header.Flags ) );
 
-    frame_ = frame;
+        ID3v2Frame frame{std::move(header)};
 
+        frame_ = frame;
+    }
+    else 
+    {        
+        Data data;
+        source_file_.read( reinterpret_cast< char* >( &( data.encoding ) ), sizeof( EnCoding ) );
+
+        
+        for (int i = 0; i < MaxFrameSize_ ; ++i)
+        {
+            source_file_.read( data.Information.data() , sizeof(std::uint8_t) );
+            
+            if (data.Information[i] == 0)
+            {
+                source_file_.seekg(sizeof(std::uint8_t));
+                break;
+            }
+            else
+            {
+                continue;
+            }
+            
+        }
+        
+        ID3v2Frame frame{std::move(header), std::move(data)};
+
+        frame_ = frame;
+    }
 }
 
 
@@ -103,21 +127,30 @@ return size;
 // frame outstream
 std::ostream& operator<<( std::ostream& stream, ID3v2Frame& out_frame )
 {
-    return stream << std::hex << out_frame.get_Frame_ID_() << "\n"
-        << std::hex << out_frame.get_size_() << "\n"
-        << std::hex << /*int*/out_frame.get_flags_() << "\n"
-        << std::hex << /*int*/out_frame.get_encoding_() << "\n"
-        << std::hex << out_frame.get_Information_() 
+    
+    if (out_frame.get_Frame_ID_()[0] != 'T')
+    {
+        return stream << "frame ID - "<< out_frame.get_Frame_ID_() << "\n"
+        << "frame size - " << std::hex << out_frame.get_size_() << "\n"
+        << "frame flags - " << int(out_frame.get_flags_()) << "\n"
         << std::endl;
+    }
+    else 
+    {
+        return stream << "frame ID - "<< out_frame.get_Frame_ID_() << "\n"
+        << "frame encoding - " << out_frame.get_encoding_() << "\n"
+        << "frame information - " << out_frame.get_Information_() 
+        << std::endl;   
+    }
 }
 
 // header outstream
 std::ostream& operator<<( std::ostream& stream, ID3v2Header& out_head )
 {
-    return stream << int(out_head.get_version_()) << "\n"
-    << int(out_head.get_sub_version_()) << "\n"
-    << int(out_head.get_flag_()) << "\n"
-    << std::hex << out_head.get_size_();
+    return stream << "header version " << int(out_head.get_version_()) << "\n"
+    << "header sub version - " << int(out_head.get_sub_version_()) << "\n"
+    << "header flag - " << int(out_head.get_flag_()) << "\n"
+    << "header size - " << std::hex << out_head.get_size_();
 
 }
 
@@ -179,15 +212,30 @@ std::uint16_t ID3v2Frame::get_flags_()
     return header_.Flags;
 }
 
-EnCoding ID3v2Frame::get_encoding_()
+std::string ID3v2Frame::get_encoding_()
 {
-    return data_.encoding;
+    switch (data_.encoding)
+    {
+    case Iso8859:
+        return "Iso8859";
+        break;
+    
+    default:
+        return "Unicode";
+        break;
+    }
 }
 
 std::string ID3v2Frame::get_Information_()
 {
-
-     return data_.Information;
+    if (data_.Information.size() == 0)
+    {
+    return "no data";
+    }
+    else
+    {
+    return data_.Information;
+    }
 }
 
 
@@ -219,10 +267,8 @@ void ID3v2Frame::set_Information_(const std::string val)
 
 std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker )
 {
-        
-    return stream << "Header information:\nmarker - ID3" << "\n" << mp3Worker.id3v2Header_ << "\nFrame information: "
+    return stream << "Header information:\nmarker - ID3" << "\n" << mp3Worker.id3v2Header_ << "\nFrame information: \n"
     << mp3Worker.frame_<< std::endl;
-        
 }
 
 } //namespace MP3

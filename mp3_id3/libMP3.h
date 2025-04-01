@@ -10,13 +10,14 @@ namespace MP3
 {
  
 constexpr static int frameIdSize_{ 4 };
- 
+const static int  MaxFrameSize_{11};
+
 #pragma pack( push, 1 )
 struct ID3v2FrameHeader
 {
     char Frame_ID[ frameIdSize_ ];
-    std::uint32_t Size;
-    std::uint16_t Flags;
+    std::uint32_t Size = 0;
+    std::uint16_t Flags = 0;
 }; 
 #pragma pack( pop )
  
@@ -38,6 +39,10 @@ class ID3v2Frame
 public:
     ID3v2Frame( ID3v2FrameHeader&& header, Data&& data ) 
     : header_(std::move(header)), data_(std::move(data)){}
+    
+    ID3v2Frame( ID3v2FrameHeader&& header ) 
+    : header_(std::move(header)){}
+    
     ID3v2Frame(): header_(), data_()
     {
         data_.encoding = None;
@@ -51,7 +56,7 @@ public:
 std::string get_Frame_ID_();
 std::uint32_t get_size_();
 std::uint16_t get_flags_();
-EnCoding get_encoding_();
+std::string get_encoding_();
 std::string get_Information_();
 
 void set_Frame_ID_(const char val[frameIdSize_]);
@@ -62,11 +67,8 @@ void set_Information_(const std::string val);
 
 ID3v2Frame operator= (const ID3v2Frame& other )
 {
-    if (this != &other)
-    {
-        header_ = other.header_;
-        data_ = other.data_;
-    }
+    this->data_ = other.data_;
+    this->header_ = other.header_;
     return *this;
 }
 
