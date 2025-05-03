@@ -4,7 +4,9 @@
 #include <stdexcept>
 #include <string>
 
-#include "libMP3.h"
+#include "libMP3Worker.h"
+#include "libMP3ID3v2Header.h"
+#include "libMP3ID3v2Frame.h"
 
 
 

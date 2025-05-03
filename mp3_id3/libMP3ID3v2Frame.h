@@ -6,9 +6,13 @@
 #include <algorithm>
 #include <cstdint>
 
+#include "libMP3Worker.h"
+#include "libMP3ID3v2Header.h"
+
+
 namespace MP3
 {
- 
+
 constexpr static int frameIdSize_{ 4 };
 const static int  MaxFrameSize_{11};
 
@@ -79,58 +83,4 @@ private:
 
 std::ostream& operator<<( std::ostream& stream, ID3v2Frame& out_frame );
 
-
-class ID3v2Header
-{
-public:
-
-std::uint8_t get_version_();
-std::uint8_t get_sub_version_();
-std::uint8_t get_flag_();
-std::uint32_t get_size_();
-
-void set_version_(const std::uint8_t val);
-void set_sub_version_(const std::uint8_t val);
-void set_flag_(const std::uint8_t val);
-void set_size_(const std::uint32_t val);
-
-std::uint32_t make_right_sizeadr(uint32_t size);
-
-private:
-    std::uint32_t size_ = 0;
-    std::uint8_t version_ = 0;
-    std::uint8_t sub_version_ = 0;
-    std::uint8_t flag_ = 0;
-};
-
-std::ostream& operator<<( std::ostream& stream, ID3v2Header& out_head );
-
-
-class Mp3Worker
-{
-friend std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker );
-
-public:
-    Mp3Worker(std::ifstream&& path2file ) 
-    : source_file_(std::move(path2file))
-    {
-        ParseId3V2Header();
-        ReadFrame();
-    }
-
-private:
-    void ParseId3V2Header();
-    void ReadFrame();
- 
- 
-private:
-    std::ifstream source_file_;
-    ID3v2Header id3v2Header_;
-    ID3v2Frame frame_;
-}; // class Mp3Worker
- 
- 
-std::ostream& operator<<( std::ostream& stream, Mp3Worker& mp3Worker );
-
-} // namespace MP3
-
+}
