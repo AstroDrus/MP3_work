@@ -7,11 +7,10 @@
 #include <algorithm>
 #include <cstring>
 
-#include <arpa/inet.h>
+#include "../ParseMP3.h"
+#include "../GetHeader.h"
+#include "../GetFrame.h"
 
-#include "../libMP3Worker.h"
-#include "../libMP3ID3v2Header.h"
-#include "../libMP3ID3v2Frame.h"
 
 namespace MP3
 {

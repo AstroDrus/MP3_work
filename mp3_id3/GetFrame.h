@@ -6,8 +6,9 @@
 #include <algorithm>
 #include <cstdint>
 
-#include "libMP3Worker.h"
-#include "libMP3ID3v2Header.h"
+#include "ParseMP3.h"
+#include "GetHeader.h"
+
 
 
 namespace MP3
