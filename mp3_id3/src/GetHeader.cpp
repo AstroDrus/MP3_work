@@ -9,9 +9,9 @@
 
 #include <arpa/inet.h>
 
-#include "../libMP3Worker.h"
-#include "../libMP3ID3v2Header.h"
-#include "../libMP3ID3v2Frame.h"
+#include "../ParseMP3.h"
+#include "../GetHeader.h"
+#include "../GetFrame.h"
 
 namespace MP3
 {
