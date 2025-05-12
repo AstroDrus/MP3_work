@@ -1,11 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
-#include <string>
 
-#include "ParseMP3.h"
-#include "GetHeader.h"
-#include "GetFrame.h"
+#include "Mp3Worker.h"
 
 
 
